@@ -34,6 +34,7 @@ public class LongestRepeatedSubString
 			}
 		}
 		
+		//checking if there is a repeated string or not and if there it is then checking if its other than space.
 		if(maxRep>0)
 		{
 			String result=str.substring(index-maxRep, index);
@@ -54,6 +55,7 @@ public class LongestRepeatedSubString
         BufferedReader reader=null;
 		try 
 		{
+			// reading the input file line by line and calling the function
 			reader = new BufferedReader(new FileReader(filepath));
             String line = null;
             LongestRepeatedSubString lrss= new LongestRepeatedSubString();
