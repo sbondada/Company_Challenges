@@ -116,6 +116,45 @@ public class Main
 	        } // returning 0 would merge keys
 	    }
 	}
+	public LinkedHashMap<Bridges,ArrayList<Bridges>> findPossibleBridges(ArrayList<Bridges> bridgeList)
+	{
+		LinkedHashMap<Bridges,ArrayList<Bridges>> intersectionMap=new LinkedHashMap<>();
+        HashMap<Bridges, Integer> intersectionCount= new  HashMap<Bridges,Integer>();
+        for(int i =0;i<bridgeList.size();i++)
+        {
+        	Bridges firstbridge=bridgeList.get(i);
+            intersectionMap.put(firstbridge,new ArrayList<Bridges>());
+        	for(int j=0;j<bridgeList.size();j++)
+        	{
+                Bridges secondbridge = bridgeList.get(j);
+        		if(i!=j && this.doIntersect(firstbridge,secondbridge))
+        		{
+                    intersectionMap.get(firstbridge).add(secondbridge);
+        		}
+            }
+        	ArrayList<Bridges> templist= intersectionMap.get(firstbridge);
+            intersectionCount.put(firstbridge,templist.size());
+        }
+        TreeMap<Bridges,Integer> sortedMap=new TreeMap<>(this.new ValueComparator(intersectionCount));
+        sortedMap.putAll(intersectionCount);
+        
+        while(sortedMap.firstEntry().getValue()>0)
+        {
+        	Bridges first=sortedMap.firstKey();
+        	ArrayList<Bridges> intersectlist=intersectionMap.get(first);
+            for(Bridges temp:intersectlist)
+            {
+                ArrayList<Bridges> templist=intersectionMap.get(temp);
+                templist.remove(first);
+                intersectionCount.put(temp,templist.size());
+            }
+            intersectionMap.remove(first);
+            intersectionCount.remove(first);
+            sortedMap.clear();
+            sortedMap.putAll(intersectionCount);
+        }
+        return intersectionMap;
+	}
 	public static void main(String args[])
 	{
 		String filepath=args[0];
@@ -135,39 +174,7 @@ public class Main
             	Point end=mnib.new Point(Float.valueOf(token[2].substring(2)),Float.valueOf(token[3].substring(0,token[3].length()-2)));
             	bridgeList.add(mnib.new Bridges(start,end,++count));
             }
-            LinkedHashMap<Bridges,ArrayList<Bridges>> intersectionMap=new LinkedHashMap<>();
-            HashMap<Bridges, Integer> intersectionCount= new  HashMap<Bridges,Integer>();
-            for(int i =0;i<bridgeList.size();i++)
-            {
-            	Bridges firstbridge=bridgeList.get(i);
-                intersectionMap.put(firstbridge,new ArrayList<Bridges>());
-            	for(int j=0;j<bridgeList.size();j++)
-            	{
-                    Bridges secondbridge = bridgeList.get(j);
-            		if(i!=j && mnib.doIntersect(firstbridge,secondbridge))
-            		{
-                        intersectionMap.get(firstbridge).add(secondbridge);
-            		}
-                }
-            	ArrayList<Bridges> templist= intersectionMap.get(firstbridge);
-                intersectionCount.put(firstbridge,templist.size());
-            }
-            TreeMap<Bridges,Integer> sortedMap=new TreeMap<>(mnib.new ValueComparator(intersectionCount));
-            sortedMap.putAll(intersectionCount);
-            while(sortedMap.firstEntry().getValue()>0)
-            {
-            	Bridges first=sortedMap.firstKey();
-            	ArrayList<Bridges> intersectlist=intersectionMap.get(first);
-            	System.out.println(first);
-                for(Bridges temp:intersectlist)
-                {
-                    ArrayList<Bridges> templist=intersectionMap.get(temp);
-                    templist.remove(first);
-                    sortedMap.put(temp,templist.size());
-                }
-                intersectionMap.remove(first);
-                sortedMap.remove(first);
-            }
+            LinkedHashMap<Bridges,ArrayList<Bridges>>  intersectionMap=mnib.findPossibleBridges(bridgeList);
             for(Bridges  result:intersectionMap.keySet())
             {
             	System.out.println(result.bridgenum);
